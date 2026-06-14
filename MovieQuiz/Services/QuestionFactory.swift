@@ -51,6 +51,10 @@ class QuestionFactory: QuestionFactoryProtocol {
 			correctAnswer: false)
 	]
 	
+	/* Реализация расширена относительно той, что была представлена в курсе
+	 Мне надаело, что все время выпадают одни и те же вопросы и я сделал механизм,
+	 который проверяет что следующий вопрос в раунде, не будет повторять один из прошлых.
+	 */
 	private var availableQuestionsIndexes: Set<Int>
 	
 	init() {
