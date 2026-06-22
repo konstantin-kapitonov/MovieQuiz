@@ -147,12 +147,6 @@ final class MovieQuizViewController: UIViewController {
 		  questionFactory?.requestNextQuestion()
 	  }
 	}
-	
-	private func dateAsString(from date: Date) -> String {
-		let formatter = DateFormatter()
-		formatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
-		return formatter.string(from: date)
-	}
 }
 
 extension MovieQuizViewController: QuestionFactoryDelegate {
