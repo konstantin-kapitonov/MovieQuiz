@@ -4,11 +4,11 @@
 //
 //  Created by Капитонов Константин on 14.06.2026.
 //
+import CoreData
 
 struct QuizQuestion {
-  // строка с названием фильма,
-  // совпадает с названием картинки афиши фильма в Assets
-  let image: String
+  // Данные с афишей фильма
+  let image: Data
   // строка с вопросом о рейтинге фильма
   let text: String
   // булевое значение (true, false), правильный ответ на вопрос

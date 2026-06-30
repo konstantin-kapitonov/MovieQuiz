@@ -8,6 +8,7 @@ final class MovieQuizViewController: UIViewController {
 	@IBOutlet private var counterLabel: UILabel!
 	@IBOutlet private var yesButton: UIButton!
 	@IBOutlet private var noButton: UIButton!
+	@IBOutlet private var activityIndicator: UIActivityIndicatorView!
 	
 	// MARK: - State
 	// переменная с номером текущего вопроса
@@ -43,10 +44,9 @@ final class MovieQuizViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 				
-		let questionfactory = QuestionFactory()
-		questionfactory.delegate = self
-		self.questionFactory = questionfactory
-		self.questionFactory?.requestNextQuestion()
+		questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+		showLoadingIndicator()
+		questionFactory?.loadData()
 	}
 	
 	// MARK: - IBActions
@@ -61,18 +61,17 @@ final class MovieQuizViewController: UIViewController {
 	// MARK: - Private Methods
 	private func convert(model: QuizQuestion) -> QuizStepViewModel {
 		QuizStepViewModel(
-			image: UIImage(named: model.image) ?? UIImage(),
+			image: UIImage(data: model.image) ?? UIImage(),
 			question: model.text,
 			questionNumber: "\(currentQuestionNumber)/\(questionsAmount)"
 		)
 	}
 	
 	// метод вывода на экран вопроса
-	@MainActor
 	private func show(quiz step: QuizStepViewModel) {
-		imageView.image = step.image
-		textLabel.text = step.question
-		counterLabel.text = step.questionNumber
+		self.imageView.image = step.image
+		self.textLabel.text = step.question
+		self.counterLabel.text = step.questionNumber
 	}
 
 	// метод вывода на экран результатов
@@ -89,10 +88,10 @@ final class MovieQuizViewController: UIViewController {
 	}
 
 	private func restartGame() {
-		self.currentQuestionNumber = 0
-		self.correctAnswers = 0
-		self.questionFactory?.resetViewedQuestions()
-		self.questionFactory?.requestNextQuestion()
+		currentQuestionNumber = 0
+		correctAnswers = 0
+		questionFactory?.resetViewedQuestions()
+		questionFactory?.requestNextQuestion()
 	}
 	
 	// метод, который проверет правильность ответа
@@ -147,10 +146,49 @@ final class MovieQuizViewController: UIViewController {
 		  questionFactory?.requestNextQuestion()
 	  }
 	}
+	
+	private func showLoadingIndicator() {
+		DispatchQueue.main.async { [weak self] in
+			self?.activityIndicator.isHidden = false
+			self?.activityIndicator.startAnimating()
+		}
+	}
+	
+	private func hideLoadingIndicator() {
+		DispatchQueue.main.async { [weak self] in
+			self?.activityIndicator.stopAnimating()
+			self?.activityIndicator.isHidden = true
+		}
+	}
+	
+	private func showNetworkError(message: String) {
+		hideLoadingIndicator()
+		DispatchQueue.main.async { [weak self] in
+			guard let self else { return }
+			let alertModel = AlertModel(
+				title: "Ошибка",
+				message: message,
+				buttonText: "Попробовать ещё раз",
+				completion: { [weak self] in
+					guard let self else { return }
+					self.restartGame()
+				})
+			alertPresenter.showAlert(vc: self, model: alertModel)
+		}
+	}
 }
 
 extension MovieQuizViewController: QuestionFactoryDelegate {
 	func didReceiveNextQuestion(question: QuizQuestion?) {
 		self.currentQuestion = question
+	}
+	
+	func didLoadDataFromServer() {
+		hideLoadingIndicator()
+		questionFactory?.requestNextQuestion()
+	}
+
+	func didFailToLoadData(with error: Error) {
+		showNetworkError(message: error.localizedDescription)
 	}
 }
