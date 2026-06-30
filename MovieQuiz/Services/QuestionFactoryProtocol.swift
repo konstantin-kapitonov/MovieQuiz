@@ -9,4 +9,5 @@ protocol QuestionFactoryProtocol {
 	func requestNextQuestion()
 	// добавлена функция сброса просмотренных вопросов
 	func resetViewedQuestions()
+	func loadData()
 }
