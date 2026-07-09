@@ -6,65 +6,29 @@
 //
 import Foundation
 
-class QuestionFactory: QuestionFactoryProtocol {
+final class QuestionFactory: QuestionFactoryProtocol {
+	
+	// MARK: - Properties
+	
 	weak var delegate: QuestionFactoryDelegate?
 	
 	private var movies: [MostPopularMovie] = []
-	
-//	private let questions: [QuizQuestion] = [
-//		.init(
-//			image: "The Godfather",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: true),
-//		.init(
-//			image: "The Dark Knight",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: true),
-//		.init(
-//			image: "Kill Bill",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: true),
-//		.init(
-//			image: "The Avengers",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: true),
-//		.init(
-//			image: "Deadpool",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: true),
-//		.init(
-//			image: "The Green Knight",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: true),
-//		.init(
-//			image: "Old",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: false),
-//		.init(
-//			image: "The Ice Age Adventures of Buck Wild",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: false),
-//		.init(
-//			image: "Tesla",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: false),
-//		.init(
-//			image: "Vivarium",
-//			text: "Рейтинг этого фильма больше чем 6?",
-//			correctAnswer: false)
-//	]
 	
 	/* Реализация расширена относительно той, что была представлена в курсе
 	 Мне надаело, что все время выпадают одни и те же вопросы и я сделал механизм,
 	 который проверяет что следующий вопрос в раунде, не будет повторять один из прошлых.
 	 */
 	private var availableQuestionsIndexes = Set<Int>()
-	private let moviesLoader: MoviesLoading
+	private let moviesLoader: MoviesLoaderProtocol
 	
-	init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
+	// MARK: - Initialization
+	
+	init(moviesLoader: MoviesLoaderProtocol, delegate: QuestionFactoryDelegate?) {
 		self.moviesLoader = moviesLoader
 		self.delegate = delegate
 	}
+	
+	// MARK: - Public Methods
 	
 	func requestNextQuestion() {
 		DispatchQueue.global().async { [weak self] in
@@ -100,6 +64,8 @@ class QuestionFactory: QuestionFactoryProtocol {
 			}
 		}
 	}
+	
+	// MARK: - Private Methods
 	
 	private func convert(movie: MostPopularMovie) -> QuizQuestion {
 		var imageData = Data()

@@ -3,12 +3,12 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
 	
 	// MARK: - IBOutlets
-	@IBOutlet private var imageView: UIImageView!
-	@IBOutlet private var textLabel: UILabel!
-	@IBOutlet private var counterLabel: UILabel!
-	@IBOutlet private var yesButton: UIButton!
-	@IBOutlet private var noButton: UIButton!
-	@IBOutlet private var activityIndicator: UIActivityIndicatorView!
+	@IBOutlet private weak var imageView: UIImageView!
+	@IBOutlet private weak var textLabel: UILabel!
+	@IBOutlet private weak var counterLabel: UILabel!
+	@IBOutlet private weak var yesButton: UIButton!
+	@IBOutlet private weak var noButton: UIButton!
+	@IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
 	
 	// MARK: - State
 	// переменная с номером текущего вопроса
@@ -43,19 +43,18 @@ final class MovieQuizViewController: UIViewController {
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
-				
-		questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
 		showLoadingIndicator()
-		questionFactory?.loadData()
+		
+		setupQuestionFactory()
 	}
 	
 	// MARK: - IBActions
 	@IBAction private func yesButtonClicked(_ sender: UIButton) {
-		check(answer: true)
+		checkAnswer(true)
 	}
 	
 	@IBAction private func noButtonClicked(_ sender: UIButton) {
-		check(answer: false)
+		checkAnswer(false)
 	}
 	
 	// MARK: - Private Methods
@@ -95,7 +94,7 @@ final class MovieQuizViewController: UIViewController {
 	}
 	
 	// метод, который проверет правильность ответа
-	private func check(answer: Bool) {
+	private func checkAnswer(_ answer: Bool) {
 		// выключаем интерактивность кнопок
 		yesButton.isEnabled = false
 		noButton.isEnabled = false
@@ -175,6 +174,15 @@ final class MovieQuizViewController: UIViewController {
 				})
 			alertPresenter.showAlert(vc: self, model: alertModel)
 		}
+	}
+	
+	private func setupQuestionFactory() {
+		questionFactory = QuestionFactory(
+			moviesLoader: MoviesLoader(),
+			delegate: self
+		)
+		
+		questionFactory?.loadData()
 	}
 }
 
