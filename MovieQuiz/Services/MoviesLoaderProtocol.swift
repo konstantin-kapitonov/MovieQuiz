@@ -15,7 +15,11 @@ struct MoviesLoader: MoviesLoaderProtocol {
 		static let apiKey = "k_zcuw1ytf"
 		static let baseUrl = "https://tv-api.com/en/API/Top250Movies/"
 	}
-	private let networkClient = NetworkClient()
+	private let networkClient: NetworkRouting
+	
+	init(networkClient: NetworkRouting = NetworkClient()) {
+		self.networkClient = networkClient
+	}
 	
 	private var mostPopularMoviesUrl: URL {
 		guard let url = URL(string: Constants.baseUrl + Constants.apiKey) else {
